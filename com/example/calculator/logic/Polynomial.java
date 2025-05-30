@@ -255,7 +255,7 @@ public class Polynomial {
         // Matches terms like: +3x^2, -2x, x, -5
         // It looks for an optional sign, then coefficient (optional if variable exists),
         // then variable (optional if constant), then exponent (optional if 1 or 0).
-        Pattern termPattern = Pattern.compile("([+-]?)\\s*(\\d*\\.?\\d*)?\\s*([a-zA-Z])?\\s*(\\^\\s*(\\d+))?");
+        //Pattern termPattern = Pattern.compile("([+-]?)\\s*(\\d*\\.?\\d*)?\\s*([a-zA-Z])?\\s*(\\^\\s*(\\d+))?");
         // This regex is still a simplification. A full parser is needed for robustness.
         // A simpler approach: split by '+' and then handle '-' within terms.
 

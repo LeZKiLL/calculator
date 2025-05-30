@@ -1,7 +1,7 @@
 package com.example.calculator.logic;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 
 // Assumes Polynomial.java and Term.java are in this package or correctly imported.
 
