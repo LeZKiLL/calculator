@@ -8,32 +8,28 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-// Import logic classes
 import com.example.calculator.logic.SymbolicEvaluator;
-// Assuming ExpressionEvaluator might be used as a fallback or for parts
-import com.example.calculator.logic.ExpressionEvaluator;
-
+import com.example.calculator.logic.ExpressionEvaluator; // Keep for potential fallback
 
 public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
 
     private JTextField displayField;
     private RoundedButton[] numberButtons = new RoundedButton[10];
-    private RoundedButton addButton, subButton, mulButton; // No div for poly usually
-    private RoundedButton equButton, clrButton, backspaceButton;
+    private RoundedButton addButton, subButton, mulButton, equalsButtonSymbol; // Renamed equButton
+    private RoundedButton clrButton, backspaceButton;
     private RoundedButton openParenButton, closeParenButton;
-    private RoundedButton xButton; // For the variable 'x'
-    private RoundedButton decButton; // For coefficients
+    private RoundedButton xButton;
+    private RoundedButton decButton;
 
     private JPanel panel;
     private SymbolicEvaluator symbolicEvaluator;
-    private ExpressionEvaluator numericalEvaluator; // For potential fallback or mixed mode
+    private ExpressionEvaluator numericalEvaluator; // For fallback if symbolic parsing fails
 
     private MainMenu mainMenuRef;
 
-    // Colors
     private final Color numberColor = new Color(80, 80, 80);
     private final Color opColor = new Color(255, 150, 0);
-    private final Color funcColor = new Color(60, 120, 180); // Might not have many functions here
+    // private final Color funcColor = new Color(60, 120, 180); // Not many functions here
     private final Color clearColor = new Color(220, 50, 50);
     private final Color equalsColor = new Color(50, 200, 50);
     private final Color parenColor = new Color(150, 100, 200);
@@ -43,9 +39,9 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
     public AlgebraicCalculatorGUI(MainMenu mainMenu) {
         this.mainMenuRef = mainMenu;
         symbolicEvaluator = new SymbolicEvaluator();
-        numericalEvaluator = new ExpressionEvaluator(); // Initialize if used
+        numericalEvaluator = new ExpressionEvaluator();
 
-        setTitle("Algebraic Calculator (FOIL)");
+        setTitle("Algebraic Calculator (Solve/Expand)");
         setSize(450, 550);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -63,8 +59,8 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
 
         displayField = new JTextField();
         displayField.setEditable(true);
-        displayField.setHorizontalAlignment(JTextField.RIGHT);
-        displayField.setFont(new Font("Arial", Font.BOLD, 24));
+        displayField.setHorizontalAlignment(JTextField.LEFT); // Better for expressions
+        displayField.setFont(new Font("Arial", Font.PLAIN, 20)); // Slightly smaller for longer expressions/solutions
         displayField.setBackground(new Color(50, 50, 50));
         displayField.setForeground(Color.WHITE);
         displayField.setBorder(new EmptyBorder(15, 10, 15, 10));
@@ -73,26 +69,22 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
         initButtons();
 
         panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 4, 5, 5)); // Adjust grid as needed
+        panel.setLayout(new GridLayout(5, 4, 5, 5));
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Example Layout (adjust for algebraic needs)
-        // Row 1
+        // Layout
         panel.add(numberButtons[7]); panel.add(numberButtons[8]); panel.add(numberButtons[9]); panel.add(xButton);
-        // Row 2
         panel.add(numberButtons[4]); panel.add(numberButtons[5]); panel.add(numberButtons[6]); panel.add(addButton);
-        // Row 3
         panel.add(numberButtons[1]); panel.add(numberButtons[2]); panel.add(numberButtons[3]); panel.add(subButton);
-        // Row 4
         panel.add(openParenButton); panel.add(numberButtons[0]); panel.add(closeParenButton); panel.add(mulButton);
-        // Row 5
-        panel.add(clrButton); panel.add(backspaceButton); panel.add(decButton); panel.add(equButton);
+        panel.add(clrButton); panel.add(backspaceButton); panel.add(decButton); panel.add(equalsButtonSymbol);
 
 
         setLayout(new BorderLayout(10, 10));
         add(displayField, BorderLayout.NORTH);
         add(panel, BorderLayout.CENTER);
+        // No setVisible(true) here, MainMenu controls it.
     }
 
     private void initButtons() {
@@ -103,8 +95,8 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
         }
 
         addButton = new RoundedButton("+"); subButton = new RoundedButton("-");
-        mulButton = new RoundedButton("*"); // For expressions like (poly1)*(poly2)
-        equButton = new RoundedButton("=");
+        mulButton = new RoundedButton("*");
+        equalsButtonSymbol = new RoundedButton("="); // Changed name from equButton
         clrButton = new RoundedButton("C"); backspaceButton = new RoundedButton("←");
         decButton = new RoundedButton(".");
         openParenButton = new RoundedButton("("); closeParenButton = new RoundedButton(")");
@@ -120,7 +112,7 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
         }
         xButton.addActionListener(this); xButton.setButtonColor(varColor);
 
-        equButton.addActionListener(this); equButton.setButtonColor(equalsColor);
+        equalsButtonSymbol.addActionListener(this); equalsButtonSymbol.setButtonColor(equalsColor);
         clrButton.addActionListener(this); clrButton.setButtonColor(clearColor);
         backspaceButton.addActionListener(this); backspaceButton.setButtonColor(clearColor);
         decButton.addActionListener(this); decButton.setButtonColor(numberColor);
@@ -129,21 +121,24 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
-        // Logic similar to ScientificCalculatorGUI for appending to display
-        switch (command) {
-            case "C": displayField.setText(""); break;
-            case "←":
-                String currentTextBS = displayField.getText();
-                int cursorPosBS = displayField.getCaretPosition();
-                if (cursorPosBS > 0 && !currentTextBS.isEmpty()) {
-                    String newText = currentTextBS.substring(0, cursorPosBS - 1) + currentTextBS.substring(cursorPosBS);
-                    displayField.setText(newText);
-                    displayField.setCaretPosition(cursorPosBS - 1);
-                }
-                break;
-            case "=": calculateExpression(); break;
-            default: // Numbers, +, -, *, (, ), x, .
-                insertIntoDisplay(command); break;
+        if (e.getSource() == equalsButtonSymbol) { // Check source for equals button
+            calculateExpression();
+        } else {
+            switch (command) {
+                case "C": displayField.setText(""); break;
+                case "←":
+                    String currentTextBS = displayField.getText();
+                    int cursorPosBS = displayField.getCaretPosition();
+                    if (cursorPosBS > 0 && !currentTextBS.isEmpty()) {
+                        String newText = currentTextBS.substring(0, cursorPosBS - 1) + currentTextBS.substring(cursorPosBS);
+                        displayField.setText(newText);
+                        displayField.setCaretPosition(cursorPosBS - 1);
+                    }
+                    break;
+                // Removed "=" case here as it's handled by source check
+                default: // Numbers, +, -, *, (, ), x, .
+                    insertIntoDisplay(command); break;
+            }
         }
         displayField.requestFocusInWindow();
     }
@@ -152,15 +147,33 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
         String expression = displayField.getText().trim();
         if (expression.isEmpty()) return;
         try {
-            String result = symbolicEvaluator.evaluate(expression);
+            String result = symbolicEvaluator.evaluate(expression); // This now handles equations too
             displayField.setText(result);
         } catch (IllegalArgumentException ex) {
-            // Fallback or just show symbolic error
-            String err = ex.getMessage() != null ? ex.getMessage() : "Invalid Symbolic Expression";
-            if (err.length() > 35) err = err.substring(0,35) + "...";
-            displayField.setText("Error: " + err);
+            // If symbolic evaluation throws IllegalArgumentException (e.g., not recognized format for symbolic)
+            // We could try numerical evaluation as a fallback if the expression looks numerical
+            if (expression.matches(".*[a-zA-Z]+.*") && !expression.contains("=")) { // Contains letters but not an equation, likely symbolic error
+                 String err = ex.getMessage() != null ? ex.getMessage() : "Invalid Symbolic Expression";
+                 if (err.length() > 35) err = err.substring(0,35) + "...";
+                 displayField.setText("Error: " + err);
+            } else if (!expression.contains("=")){ // No letters, not an equation, try numerical
+                try {
+                    Object numResult = numericalEvaluator.evaluate(expression); // Assuming numericalEvaluator handles Object
+                    displayField.setText(numResult.toString()); // Simple toString for now
+                } catch (Exception numEx) {
+                     String err = ex.getMessage() != null ? ex.getMessage() : "Invalid Expression";
+                     if (err.length() > 35) err = err.substring(0,35) + "...";
+                     displayField.setText("Error: " + err);
+                }
+            } else { // It was an equation and symbolic failed, or other symbolic error
+                 String err = ex.getMessage() != null ? ex.getMessage() : "Invalid Expression";
+                 if (err.length() > 35) err = err.substring(0,35) + "...";
+                 displayField.setText("Error: " + err);
+            }
+
         } catch (Exception ex) { // Catch any other unexpected error
             displayField.setText("Error: Calculation failed");
+            // ex.printStackTrace(); // For debugging
         }
         displayField.selectAll();
         displayField.requestFocusInWindow();
@@ -170,7 +183,7 @@ public class AlgebraicCalculatorGUI extends JFrame implements ActionListener {
         int cursorPos = displayField.getCaretPosition();
         String currentText = displayField.getText();
         String newText = currentText.substring(0, cursorPos) + text + currentText.substring(cursorPos);
-        if (newText.length() < 60) {
+        if (newText.length() < 100) { // Allow longer expressions for algebra
             displayField.setText(newText);
             displayField.setCaretPosition(cursorPos + text.length());
         }
