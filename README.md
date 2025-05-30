@@ -1,7 +1,6 @@
 # Java Multi-Mode Calculator
-### A vibing code project
 
-A Swing-based desktop calculator application offering Simple, Scientific (Numerical), Algebraic (Symbolic), and basic Calculus modes, with a settings panel for customization.
+A Swing-based desktop calculator application offering Simple, Scientific (Numerical), Algebraic (Symbolic), and basic Calculus modes, with a settings panel for customization. Also, a hobby and a vibing code project.
 
 
 ## Overview
