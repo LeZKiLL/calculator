@@ -1,26 +1,18 @@
 package com.example.calculator;
 
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+// UIManager is needed if we don't use SettingsManager.applyTheme() here directly
+// import javax.swing.UIManager;
 
-import com.example.calculator.ui.MainMenu; // Import MainMenu
+import com.example.calculator.logic.SettingsManager; // Import SettingsManager
+import com.example.calculator.ui.MainMenu;
 
 public class MainApp {
 
     public static void main(String[] args) {
-        // Set a more modern Look and Feel if available (Nimbus)
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // If Nimbus is not available, use the default L&F
-            // You can log this error or ignore it if default L&F is acceptable
-            System.err.println("Nimbus L&F not found, using default.");
-        }
+        // Apply saved theme at startup
+        String currentTheme = SettingsManager.loadTheme();
+        SettingsManager.applyTheme(currentTheme); // This will set FlatLaf or fallback
 
         SwingUtilities.invokeLater(() -> {
             MainMenu mainMenu = new MainMenu();

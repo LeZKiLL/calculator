@@ -18,7 +18,7 @@ public class CalculusCalculatorGUI extends JFrame implements ActionListener {
     private JTextField resultDisplayField;   // For showing the result (derivative/integral)
 
     private RoundedButton[] numberButtons = new RoundedButton[10];
-    private RoundedButton addButton, subButton, mulButton; // For constructing terms if needed
+    private RoundedButton addButton, subButton; //mulButton; // For constructing terms if needed
     private RoundedButton xButton, powerButton, decimalButton;
     private RoundedButton openParenButton, closeParenButton; // For terms like (x+1) if parser handles it
 
