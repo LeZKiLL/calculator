@@ -5,23 +5,20 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Import other calculator GUIs
-// import com.example.calculator.ui.SimpleCalculatorGUI;
-// import com.example.calculator.ui.ScientificCalculatorGUI;
-// import com.example.calculator.ui.AlgebraicCalculatorGUI;
-// Assuming RoundedButton is in this package
+// Assuming other calculator GUIs and RoundedButton are correctly in this package or imported
 
 public class MainMenu extends JFrame implements ActionListener {
 
     private RoundedButton btnSimpleCalculator;
     private RoundedButton btnScientificCalculator;
     private RoundedButton btnAlgebraicCalculator;
-    private RoundedButton btnCalculusCalculator; // New button
+    private RoundedButton btnCalculusCalculator;
+    private RoundedButton btnSettings; // New Settings button
     private RoundedButton btnExit;
 
     public MainMenu() {
         setTitle("Calculator Main Menu");
-        setSize(400, 400); // Increased height for new button
+        setSize(400, 450); // Increased height for new button
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -35,40 +32,42 @@ public class MainMenu extends JFrame implements ActionListener {
         btnSimpleCalculator = new RoundedButton("Simple Calculator");
         btnScientificCalculator = new RoundedButton("Scientific Calculator");
         btnAlgebraicCalculator = new RoundedButton("Algebraic Calculator");
-        btnCalculusCalculator = new RoundedButton("Calculus Calculator"); // New
+        btnCalculusCalculator = new RoundedButton("Calculus Calculator");
+        btnSettings = new RoundedButton("Settings"); // Initialize
         btnExit = new RoundedButton("Exit");
 
         Font buttonFont = new Font("Arial", Font.PLAIN, 16);
         Color buttonColor = new Color(80, 80, 80);
-        Color calculusButtonColor = new Color(60, 150, 80); // Different color for calculus
+        Color calculusButtonColor = new Color(60, 150, 80);
+        Color settingsButtonColor = new Color(100, 100, 180); // Color for settings
         Color exitButtonColor = new Color(200, 60, 60);
 
-        btnSimpleCalculator.setFont(buttonFont);
-        btnSimpleCalculator.setButtonColor(buttonColor);
-        btnScientificCalculator.setFont(buttonFont);
-        btnScientificCalculator.setButtonColor(buttonColor);
-        btnAlgebraicCalculator.setFont(buttonFont);
-        btnAlgebraicCalculator.setButtonColor(buttonColor);
-        btnCalculusCalculator.setFont(buttonFont); // New
-        btnCalculusCalculator.setButtonColor(calculusButtonColor); // New
-        btnExit.setFont(buttonFont);
-        btnExit.setButtonColor(exitButtonColor);
+        // Styling buttons
+        btnSimpleCalculator.setFont(buttonFont); btnSimpleCalculator.setButtonColor(buttonColor);
+        btnScientificCalculator.setFont(buttonFont); btnScientificCalculator.setButtonColor(buttonColor);
+        btnAlgebraicCalculator.setFont(buttonFont); btnAlgebraicCalculator.setButtonColor(buttonColor);
+        btnCalculusCalculator.setFont(buttonFont); btnCalculusCalculator.setButtonColor(calculusButtonColor);
+        btnSettings.setFont(buttonFont); btnSettings.setButtonColor(settingsButtonColor); // Style settings
+        btnExit.setFont(buttonFont); btnExit.setButtonColor(exitButtonColor);
 
+        // Action Listeners
         btnSimpleCalculator.addActionListener(this);
         btnScientificCalculator.addActionListener(this);
         btnAlgebraicCalculator.addActionListener(this);
-        btnCalculusCalculator.addActionListener(this); // New
+        btnCalculusCalculator.addActionListener(this);
+        btnSettings.addActionListener(this); // Add listener
         btnExit.addActionListener(this);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(5, 1, 10, 15)); // 5 rows now
+        buttonPanel.setLayout(new GridLayout(6, 1, 10, 12)); // 6 rows now
         buttonPanel.setOpaque(false);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 50, 20, 50));
 
         buttonPanel.add(btnSimpleCalculator);
         buttonPanel.add(btnScientificCalculator);
         buttonPanel.add(btnAlgebraicCalculator);
-        buttonPanel.add(btnCalculusCalculator); // New
+        buttonPanel.add(btnCalculusCalculator);
+        buttonPanel.add(btnSettings); // Add settings button to panel
         buttonPanel.add(btnExit);
 
         setLayout(new BorderLayout());
@@ -79,30 +78,26 @@ public class MainMenu extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
+
+        if (source == btnSettings) {
+            SettingsGUI settingsDialog = new SettingsGUI(this, this); // 'this' is the owner Frame
+            settingsDialog.setVisible(true);
+            // MainMenu remains visible, settings dialog is modal
+            return; // Don't hide main menu for settings
+        }
+
+        // Hide main menu for calculator launch (if not settings)
         this.setVisible(false);
 
         if (source == btnSimpleCalculator) {
-            SwingUtilities.invokeLater(() -> {
-                SimpleCalculatorGUI simpleCalc = new SimpleCalculatorGUI(this);
-                simpleCalc.setVisible(true);
-            });
+            SwingUtilities.invokeLater(() -> new SimpleCalculatorGUI(this).setVisible(true));
         } else if (source == btnScientificCalculator) {
-            SwingUtilities.invokeLater(() -> {
-                ScientificCalculatorGUI scientificCalc = new ScientificCalculatorGUI(this);
-                scientificCalc.setVisible(true);
-            });
+            SwingUtilities.invokeLater(() -> new ScientificCalculatorGUI(this).setVisible(true));
         } else if (source == btnAlgebraicCalculator) {
-             SwingUtilities.invokeLater(() -> {
-                AlgebraicCalculatorGUI algebraicCalc = new AlgebraicCalculatorGUI(this);
-                algebraicCalc.setVisible(true);
-            });
-        } else if (source == btnCalculusCalculator) { // New
-            SwingUtilities.invokeLater(() -> {
-                CalculusCalculatorGUI calculusCalc = new CalculusCalculatorGUI(this);
-                calculusCalc.setVisible(true);
-            });
-        }
-        else if (source == btnExit) {
+             SwingUtilities.invokeLater(() -> new AlgebraicCalculatorGUI(this).setVisible(true));
+        } else if (source == btnCalculusCalculator) {
+            SwingUtilities.invokeLater(() -> new CalculusCalculatorGUI(this).setVisible(true));
+        } else if (source == btnExit) {
             System.exit(0);
         }
     }
